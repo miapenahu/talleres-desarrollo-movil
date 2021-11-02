@@ -7,5 +7,10 @@
     <string name="result_tie">Es un empate.</string>
     <string name="result_human_wins">Ganaste!</string>
     <string name="result_computer_wins">Ganó don Bot!</string>
-    <string name="menu_new_game">Juego nuevo</string>
+    <string name="stats_card_title">Stats</string>
+    <string name="stats_card_ties">Empates</string>
+    <string name="stats_card_human_wins">Ganaste</string>
+    <string name="stats_card_computer_wins">Ganó don Bot</string>
+    <string name="op_menu_new_game">Juego nuevo</string>
+    <string name="op_menu_reset_games">Reiniciar Cuenta</string>
 </resources>

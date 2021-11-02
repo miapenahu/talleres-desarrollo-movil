@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/new_game"
+        android:title="@string/op_menu_new_game"/>
+    <item android:id="@+id/reset_games"
+        android:title="@string/op_menu_reset_games" />
+</menu>

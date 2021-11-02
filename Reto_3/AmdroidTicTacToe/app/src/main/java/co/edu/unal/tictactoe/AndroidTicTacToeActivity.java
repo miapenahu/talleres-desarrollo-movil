@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -22,17 +23,39 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
     //Textos variados mostrados
     private TextView mInfoTextView;
 
+    // Card Estadisticas
+
+    // Ties / Human Wins / Computer Wins
+    private int[] stats = {0,0,0};
+
+    private TextView mStatsTiesNumber;
+    private TextView mStatsHumanWinsNumber;
+    private TextView mStatsComputerWinsNumber;
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         super.onCreateOptionsMenu(menu);
-        menu.add(R.string.menu_new_game);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         startNewGame();
-        return true;
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.new_game:
+                startNewGame();
+                return true;
+            case R.id.reset_games:
+                resetGameCount();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        //return true;
     }
 
     @Override
@@ -52,10 +75,25 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
         mBoardButtons[8] = findViewById(R.id.nine);
 
         mInfoTextView = findViewById(R.id.information);
+        //Stats
+        mStatsTiesNumber = findViewById(R.id.TiesNumber);
+        mStatsHumanWinsNumber = findViewById(R.id.HumanWinsNumber);
+        mStatsComputerWinsNumber = findViewById(R.id.ComputerWinsNumber);
+
         mGame = new TicTacToeGame();
 
         startNewGame();
     }
+
+    private void resetGameCount(){
+        stats = new int[]{0, 0, 0};
+        mStatsTiesNumber.setText(String.valueOf(stats[0]));
+        mStatsHumanWinsNumber.setText(String.valueOf(stats[1]));
+        mStatsComputerWinsNumber.setText(String.valueOf(stats[2]));
+        startNewGame();
+    }
+
+
     // Preparando el tablero
     private void startNewGame(){
         mGame.clearBoard();
@@ -81,11 +119,13 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
                 int winner = mGame.checkForWinner();
                 if (winner == 0) {
                     mInfoTextView.setText(R.string.turn_computer);
+                    disableBoard();
                     Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
                         public void run() {
                             computerMove();
                             int winner = mGame.checkForWinner();
+                            enableBoard();
                             checkWinner(winner);
                         }
                     }, 1000);
@@ -102,12 +142,18 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
             mInfoTextView.setText(R.string.turn_human);
         else if (winner == 1) {
             mInfoTextView.setText(R.string.result_tie);
+            stats[0]++;
+            mStatsTiesNumber.setText(String.valueOf(stats[0]));
             disableBoard();
         }else if (winner == 2) {
             mInfoTextView.setText(R.string.result_human_wins);
+            stats[1]++;
+            mStatsHumanWinsNumber.setText(String.valueOf(stats[1]));
             disableBoard();
         } else {
             mInfoTextView.setText(R.string.result_computer_wins);
+            stats[2]++;
+            mStatsComputerWinsNumber.setText(String.valueOf(stats[2]));
             disableBoard();
         }
     }
@@ -115,6 +161,13 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
     private void disableBoard(){
         for(int i = 0; i < mBoardButtons.length; i++){
             mBoardButtons[i].setEnabled(false);
+        }
+    }
+
+    private void enableBoard(){
+        for(int i = 0; i < mBoardButtons.length; i++){
+            if(mBoardButtons[i].getText().length() == 0)
+                mBoardButtons[i].setEnabled(true);
         }
     }
 
