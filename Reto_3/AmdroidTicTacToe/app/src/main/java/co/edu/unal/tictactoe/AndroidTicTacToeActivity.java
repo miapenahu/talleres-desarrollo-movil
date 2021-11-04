@@ -18,6 +18,8 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
 
     // Representa el estado interno del juego
     private TicTacToeGame mGame;
+    // Turno al iniciar
+    private boolean mStart;
     //Botones que conforman el tablero
     private Button mBoardButtons[];
     //Textos variados mostrados
@@ -47,6 +49,7 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.new_game:
+                mStart = !mStart;
                 startNewGame();
                 return true;
             case R.id.reset_games:
@@ -81,6 +84,7 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
         mStatsComputerWinsNumber = findViewById(R.id.ComputerWinsNumber);
 
         mGame = new TicTacToeGame();
+        mStart = false;
 
         startNewGame();
     }
@@ -104,7 +108,12 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
             mBoardButtons[i].setOnClickListener(new ButtonClickListener(i));
         }
         // La persona va primero
-        mInfoTextView.setText(R.string.first_human);
+        if(!mStart) {
+            mInfoTextView.setText(R.string.first_human);
+        } else{
+            mInfoTextView.setText(R.string.first_computer);
+            computerMakeMove();
+        }
     }
     // Maneja los clicks en los botones del tablero
     private class ButtonClickListener implements View.OnClickListener {
@@ -114,33 +123,48 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
         }
         public void onClick(View view) {
             if (mBoardButtons[location].isEnabled()) {
-                setMove(TicTacToeGame.HUMAN_PLAYER, location);
-                // If no winner yet, let the computer make a move
-                int winner = mGame.checkForWinner();
-                if (winner == 0) {
-                    mInfoTextView.setText(R.string.turn_computer);
-                    disableBoard();
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        public void run() {
-                            computerMove();
-                            int winner = mGame.checkForWinner();
-                            enableBoard();
-                            checkWinner(winner);
-                        }
-                    }, 1000);
-
-                } else {
-                    checkWinner(winner);
-                }
+                    setMove(TicTacToeGame.HUMAN_PLAYER, location);
+                    // If no winner yet, let the computer make a move
+                    int winner = mGame.checkForWinner();
+                    if (winner == 0) {
+                        mInfoTextView.setText(R.string.turn_computer);
+                        computerMakeMove();
+                    } else{
+                        checkWinner(winner);
+                    }
             }
         }
     }
 
+    private void computerMakeMove(){
+        disableBoard();
+        computerMove();
+        enableBoard();
+        int winner = mGame.checkForWinner();
+        checkWinner(winner);
+        /*Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                computerMove();
+                enableBoard();
+                int winner = mGame.checkForWinner();
+                checkWinner(winner);
+            }
+        }, 1000);*/
+    }
+
     private void checkWinner(int winner){
-        if (winner == 0)
-            mInfoTextView.setText(R.string.turn_human);
-        else if (winner == 1) {
+        if (winner == 0) {
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    int winner = mGame.checkForWinner();
+                    if (winner == 0) {
+                        mInfoTextView.setText(R.string.turn_human);
+                    }
+                }
+            }, 1300);
+        }else if (winner == 1) {
             mInfoTextView.setText(R.string.result_tie);
             stats[0]++;
             mStatsTiesNumber.setText(String.valueOf(stats[0]));

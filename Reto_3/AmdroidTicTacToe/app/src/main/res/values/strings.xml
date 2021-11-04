@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">Tic-Tac-Toe App</string>
     <string name="first_human">Tu vas primero.</string>
+    <string name="first_computer">Don Bot va primero.</string>
     <string name="turn_human">Es tu turno.</string>
     <string name="turn_computer">Es turno de don Bot.</string>
     <string name="result_tie">Es un empate.</string>
