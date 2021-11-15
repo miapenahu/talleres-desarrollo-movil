@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Amdroid Triqui</string>
+    <string name="first_human">Tu vas primero.</string>
+    <string name="first_computer">Don Bot va primero.</string>
+    <string name="turn_human">Es tu turno.</string>
+    <string name="turn_computer">Es turno de don Bot.</string>
+    <string name="result_tie">Es un empate.</string>
+    <string name="result_human_wins">Ganaste!</string>
+    <string name="result_computer_wins">Ganó don Bot!</string>
+    <string name="stats_card_title">Stats</string>
+    <string name="stats_card_ties">Empates</string>
+    <string name="stats_card_human_wins">Ganaste</string>
+    <string name="stats_card_computer_wins">Ganó don Bot</string>
+    <string name="op_menu_title">Opciones</string>
+    <string name="op_menu_new_game">Juego nuevo</string>
+    <string name="op_menu_reset_games">Reiniciar Cuenta</string>
+    <string name="op_menu_ai_difficulty">Dificultad</string>
+    <string name="op_menu_auto_new_game">Auto Nuevo Juego</string>
+    <string name="op_menu_quit">Salir del juego</string>
+    <string name="difficulty_choose">Escoge una dificultad</string>
+    <string name="toast_difficulty">Dificultad: </string>
+    <string name="toast_reset_games">¡Cuenta Reiniciada!</string>
+    <string name="toast_auto_new_game">Auto Juego Nuevo: </string>
+    <string name="toast_new_game">¡Juego Nuevo Iniciado!</string>
+    <string name="difficulty_easy">Fácil</string>
+    <string name="difficulty_harder">Moderado</string>
+    <string name="difficulty_expert">Experto</string>
+    <string name="quit_question">¿Estás seguro de salir? :(</string>
+    <string name="auto_new_game_question">¿Automáticamente empezar un Nuevo Juego?</string>
+    <string name="begin_auto_new_game">¡Fin! Empezando Juego Nuevo</string>
+    <string name="yes">Si</string>
+    <string name="no">No</string>
+    <string name="str_true">Verdadero</string>
+    <string name="str_false">Falso</string>
+</resources>
