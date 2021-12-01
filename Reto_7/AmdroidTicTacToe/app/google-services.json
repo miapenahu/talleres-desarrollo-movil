@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "114584675570",
+    "project_id": "multi-triqui",
+    "storage_bucket": "multi-triqui.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:114584675570:android:c9b97f9db99b269dfcdc6b",
+        "android_client_info": {
+          "package_name": "co.edu.unal.tictactoe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "114584675570-m804heb3i90394rtnk1af6i3c18ct3nb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4_SjolS8A-3gVrWVwWYZQc6DrUgUyN0A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "114584675570-m804heb3i90394rtnk1af6i3c18ct3nb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
