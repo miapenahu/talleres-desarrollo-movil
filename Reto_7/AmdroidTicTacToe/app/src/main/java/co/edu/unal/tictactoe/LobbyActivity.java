@@ -1,6 +1,7 @@
 package co.edu.unal.tictactoe;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,8 +30,7 @@ public class LobbyActivity extends AppCompatActivity {
     Button bCrearSala;
 
     List<String> lobby;
-    List<List<Integer>> statsLobby;
-    List<Integer> statsSala;
+    List<String> lobbyStrings;
 
     String username = "";
     String nombreSala = "";
@@ -50,14 +51,14 @@ public class LobbyActivity extends AppCompatActivity {
         username = preferences.getString("username","");
         nombreSala = username;
 
+        setTitle("Salas para " + nombreSala); //Título de la sala
+
         lvSalas = findViewById(R.id.lvSalas);
         bCrearSala = findViewById(R.id.bCrearSala);
 
         //Todas las salas disponibles existentes
         lobby = new ArrayList<>();
-        statsLobby = new ArrayList<>();
-        statsSala = new ArrayList<>();
-        statsSala.add(0,-1);
+        lobbyStrings = new ArrayList<>();
 
         bCrearSala.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,21 +68,25 @@ public class LobbyActivity extends AppCompatActivity {
                 bCrearSala.setEnabled(false);
                 nombreSala = username;
                 salaRef = database.getReference("salas/" + nombreSala + "/jugador1");
-                addRoomEventListener();
                 salaRef.setValue(username);
-
+                addRoomEventListener();
             }
         });
 
         lvSalas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
                 //Unirse a una sala previamente creada y añadir el usuario actual como jugador 2
                 nombreSala = lobby.get(position);
-                statsSala = statsLobby.get(position);
-                salaRef = database.getReference("salas/" + nombreSala + "/jugador2");
-                addRoomEventListener();
+                System.out.println("nombreSala: "+nombreSala);
+                if(nombreSala.equals(username)) {
+                    salaRef = database.getReference("salas/" + nombreSala + "/jugador1");
+                } else {
+                    salaRef = database.getReference("salas/" + nombreSala + "/jugador2");
+                }
                 salaRef.setValue(username);
+                addRoomEventListener();
             }
         });
 
@@ -89,27 +94,31 @@ public class LobbyActivity extends AppCompatActivity {
         addLobbyEventListener();
     }
 
+    /*@Override
+    public void onBackPressed() {
+        Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
+        //intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        startActivity(intent);
+        finish();
+    }*/
+
     private void addRoomEventListener(){
         salaRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 //Ingresar en la sala
-                bCrearSala.setText("Crear Sala");
-                bCrearSala.setEnabled(true);
-
-                Intent intent = new Intent(getApplicationContext(),MultiTicTacToeActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                intent.putExtra("nombreSala",nombreSala);
-                if(statsSala.get(0) >= 0) {
-                    intent.putExtra("numTies", statsSala.get(0));
-                    intent.putExtra("numPlayer1Wins", statsSala.get(1));
-                    intent.putExtra("numPlayer2Wins", statsSala.get(2));
-                } else {
-                    intent.putExtra("numTies", 0);
-                    intent.putExtra("numPlayer1Wins", 0);
-                    intent.putExtra("numPlayer2Wins", 0);
+                if(snapshot.exists()) {
+                    if (!snapshot.getValue(String.class).equals("")) { //Si no está saliendo de una sala
+                        Intent intent = new Intent(getApplicationContext(), MultiTicTacToeActivity.class);
+                        //intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                        intent.putExtra("nombreSala", nombreSala);
+                        startActivity(intent);
+                    }
+                    bCrearSala.setText("Crear Sala");
+                    bCrearSala.setEnabled(true);
                 }
-                startActivity(intent);
             }
 
             @Override
@@ -129,40 +138,73 @@ public class LobbyActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 //Mostrar la lista de las salas
                 lobby.clear();
+                lobbyStrings.clear();
+
                 Iterable<DataSnapshot> salas = snapshot.getChildren();
-                for(DataSnapshot dss : salas){
-                    lobby.add(dss.getKey());
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(LobbyActivity.this, android.R.layout.simple_list_item_1, lobby);
-                    lvSalas.setAdapter(adapter);
-                    List<Integer> elem = new ArrayList<>();
-                    elem.add(0,-1);
-                    elem.add(1,-1);
-                    elem.add(2,-1);
-                    Iterable<DataSnapshot> sala = dss.getChildren();
-                    for(DataSnapshot ss : sala){
-                        System.out.println("sala.getKey(): "+ss.getKey());
-                        if(ss.getKey().equals("stats")){
-                            Iterable<DataSnapshot> statsDS = ss.getChildren();
-                            for(DataSnapshot stt : statsDS){
-                                System.out.println("stt.getKey(): "+stt.getKey());
-                                if(stt.getKey().equals("empates")){
-                                    elem.add(0,stt.getValue(Integer.class));
-                                } else if(stt.getKey().equals("p1_gana")){
-                                    elem.add(1,stt.getValue(Integer.class));
-                                } else if(stt.getKey().equals("p2_gana")){
-                                    elem.add(2,stt.getValue(Integer.class));
-                                }
+                for(DataSnapshot sala : salas){
+                    boolean check_if_host_online = false; //Mirar si el host se encuentra en la sala
+                    //lobby.add(sala.getKey());
+                    Iterable<DataSnapshot> itemsJuego = sala.getChildren();
+                    for(DataSnapshot item : itemsJuego){
+                        if(item.getKey().equals("jugador1")){
+                            if(!item.getValue(String.class).equals("")){
+                                check_if_host_online = true;
+
                             }
                         }
                     }
-                    System.out.println("Elem: "+elem.toString());
-                    statsLobby.add(elem);
+
+                    lobby.add(sala.getKey());
+                    if(check_if_host_online){
+                        lobbyStrings.add(sala.getKey() + " (Online)");
+                    } else{
+                        lobbyStrings.add(sala.getKey());
+                    }
+
+                    ArrayAdapter<String> adapter;
+                    adapter = new ArrayAdapter<>(LobbyActivity.this, android.R.layout.simple_list_item_1, lobbyStrings);
+                    lvSalas.setAdapter(adapter);
+
+                    if(sala.getKey().equals(username)){
+                        bCrearSala.setText("Ir a mi Sala");
+                        bCrearSala.setEnabled(true);
+                    }
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 //No hacer nada en caso de error
+            }
+        });
+        lobbyRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                for(String str : lobby){
+                    if(str.equals(snapshot.getKey())){
+                        str += str;
+                    }
+                }
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
     }

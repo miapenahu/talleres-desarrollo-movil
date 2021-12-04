@@ -30,15 +30,20 @@
     <string name="toast_difficulty">Dificultad: </string>
     <string name="toast_reset_games">¡Cuenta Reiniciada!</string>
     <string name="toast_auto_new_game">Auto Juego Nuevo: </string>
+    <string name="toast_auto_activated">Auto Juego Nuevo: </string>
     <string name="toast_new_game">¡Juego Nuevo Iniciado!</string>
     <string name="difficulty_easy">Fácil</string>
     <string name="difficulty_harder">Moderado</string>
     <string name="difficulty_expert">Experto</string>
     <string name="quit_question">¿Estás seguro de salir? :(</string>
     <string name="auto_new_game_question">¿Automáticamente empezar un Nuevo Juego?</string>
+    <string name="dialog_sala_cerrada">El host de la sala ha salido, por lo que ésta se cerrará.</string>
     <string name="begin_auto_new_game">¡Fin! Empezando Juego Nuevo</string>
-    <string name="yes">Si</string>
-    <string name="no">No</string>
+    <string name="str_yes">Si</string>
+    <string name="str_no">No</string>
+    <string name="str_ok">Ok</string>
     <string name="str_true">Verdadero</string>
     <string name="str_false">Falso</string>
+    <string name="str_player_1">Jugador 1</string>
+    <string name="str_player_2">Jugador 2</string>
 </resources>

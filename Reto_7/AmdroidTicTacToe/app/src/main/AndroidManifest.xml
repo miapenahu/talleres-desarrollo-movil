@@ -12,10 +12,13 @@
         <activity
             android:name=".MultiTicTacToeActivity"
             android:exported="false"
+            android:launchMode="singleTask"
             />
         <activity
             android:name=".LoginActivity"
-            android:exported="true">
+            android:exported="true"
+            android:launchMode="singleTask"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,10 +27,14 @@
         </activity>
         <activity
             android:name=".LobbyActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:launchMode="singleTask"
+            />
         <activity
             android:name=".AndroidTicTacToeActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:launchMode="singleTask"
+            />
     </application>
 
 </manifest>

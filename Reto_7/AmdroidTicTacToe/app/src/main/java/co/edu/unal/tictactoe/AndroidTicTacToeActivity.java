@@ -1,13 +1,10 @@
 package co.edu.unal.tictactoe;
 
-import java.lang.Thread.*;
-
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.*;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,12 +14,11 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.*;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 public class AndroidTicTacToeActivity extends AppCompatActivity {
 
@@ -105,6 +101,10 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Fullscreen
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //Content
         setContentView(R.layout.activity_main);
 
         //Juego
@@ -243,18 +243,18 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
                 // Create the quit confirmation dialog
                 builder.setMessage(R.string.quit_question)
                         .setCancelable(false)
-                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                        .setPositiveButton(R.string.str_yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 AndroidTicTacToeActivity.this.finish();
                             }
                         })
-                        .setNegativeButton(R.string.no, null);
+                        .setNegativeButton(R.string.str_no, null);
                 dialog = builder.create();
                 break;
             case DIALOG_AUTO_NEW_GAME:
                 builder.setMessage(R.string.auto_new_game_question)
                         .setCancelable(false)
-                        .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                        .setNegativeButton(R.string.str_no, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 CharSequence toastText = getResources().getString(R.string.toast_auto_new_game)+ " "+ getResources().getString(R.string.str_false);
                                 Toast.makeText(getApplicationContext(), toastText, Toast.LENGTH_SHORT).show();
@@ -262,7 +262,7 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
                                 startNewGame();
                             }
                         })
-                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                        .setPositiveButton(R.string.str_yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
 
                                 CharSequence toastText = getResources().getString(R.string.toast_auto_new_game)+ " "+ getResources().getString(R.string.str_true);

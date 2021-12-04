@@ -8,6 +8,10 @@
                 android:title="@string/op_menu_new_game"
                 android:icon="@drawable/new_game"
                 app:showAsAction = "never"/>
+            <item android:id="@+id/auto_new_game"
+                android:title="@string/op_menu_auto_new_game"
+                android:icon="@drawable/auto_new_game"
+                app:showAsAction = "never"/>
         </menu>
     </item>
 
