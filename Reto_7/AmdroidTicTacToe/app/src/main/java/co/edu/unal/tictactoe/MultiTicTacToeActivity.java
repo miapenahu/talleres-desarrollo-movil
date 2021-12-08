@@ -36,7 +36,7 @@ public class MultiTicTacToeActivity extends AppCompatActivity {
     // Representa el estado interno del juego
     private TicTacToeGame mGame;
     // Turno al iniciar
-    private boolean mPlayer1Start = false;
+    private boolean mPlayer1Start = true;
     //Botones que conforman el tablero
     private Button mBoardButtons[];
     //Textos variados mostrados
@@ -54,6 +54,11 @@ public class MultiTicTacToeActivity extends AppCompatActivity {
     private boolean mNewGame = false;
     //Juego nuevo automático
     private boolean mAutoNewGame = false;
+    //Revisa si el host se ha ido
+    private boolean mPlayer1Gone = false;
+    //Revisa si el player2 ha llegado
+    private boolean mPlayer2Joined = false;
+    private int mDelayPlayer1Gone = 3000; //Delay para mostrar el dialogo de sala cerrada
     //Delays
     private int autoNewGameDelay = 5000;
     private int computerMoveDelay = 1000;
@@ -85,6 +90,7 @@ public class MultiTicTacToeActivity extends AppCompatActivity {
     //Refs Triqui
     DatabaseReference playerRef;
     DatabaseReference player1Ref;
+    DatabaseReference player2Ref;
     DatabaseReference player1TurnRef;
     DatabaseReference newGameRef;
     DatabaseReference autoNewGameRef;
@@ -94,6 +100,21 @@ public class MultiTicTacToeActivity extends AppCompatActivity {
     DatabaseReference resTiesRef;
     DatabaseReference resPlayer1WinsRef;
     DatabaseReference resPlayer2WinsRef;
+    //Listeners Firebase
+    ValueEventListener playerVEL;
+    ValueEventListener player1VEL;
+    ValueEventListener player2VEL;
+    ValueEventListener player1TurnVEL;
+    ValueEventListener newGameVEL;
+    ValueEventListener autoNewGameVEL;
+    ChildEventListener boardCEL;
+    ValueEventListener salaVEL;
+    ValueEventListener player1StartVEL;
+    ValueEventListener resTiesVEL;
+    ValueEventListener resPlayer1WinsVEL;
+    ValueEventListener resPlayer2WinsVEL;
+    //Runnables
+    Runnable runClose;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -104,18 +125,6 @@ public class MultiTicTacToeActivity extends AppCompatActivity {
         outState.putBoolean("mPlayer1Turn", mPlayer1Turn);
         outState.putBoolean("mAutoNewGame", mAutoNewGame);
         outState.putCharSequence("info", mInfoTextView.getText());
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        //Si hay un estado en el juego, recuperarlo
-        //System.out.println("recovered board: "+ String.valueOf(savedInstanceState.getCharArray("board")));
-        /*mGame.setBoardState(savedInstanceState.getCharArray("board"));
-        mGameOver = savedInstanceState.getBoolean("mGameOver");
-        mInfoTextView.setText(savedInstanceState.getCharSequence("info"));
-        mPlayer1Start = savedInstanceState.getBoolean("mPlayer1Start");
-        mPlayer1Turn = savedInstanceState.getBoolean("mPlayer1Turn", mPlayer1Turn);*/
     }
 
     @Override
@@ -143,7 +152,7 @@ public class MultiTicTacToeActivity extends AppCompatActivity {
         mStatsPlayer1WinsNumber = findViewById(R.id.Player1WinsNumber);
         mStatsPlayer2WinsNumber = findViewById(R.id.Player2WinsNumber);
 
-        if(savedInstanceState != null){
+        if(savedInstanceState != null){ //equivalente a onRestoreInstanceState
             System.out.println("second time config");
             mGame.setBoardState(savedInstanceState.getCharArray("board"));
             mGameOver = savedInstanceState.getBoolean("mGameOver");
@@ -178,6 +187,9 @@ public class MultiTicTacToeActivity extends AppCompatActivity {
                 playerText = getResources().getString(R.string.str_player_2) +": "+username;
                 mPlayerImageView.setImageResource(R.drawable.o_min);
             }
+            if(extras.getBoolean("salaCerrada",false)){
+                mDelayPlayer1Gone = 0;
+            }
         }
 
         mPlayerTextView.setText(playerText); //Información del jugador
@@ -185,10 +197,11 @@ public class MultiTicTacToeActivity extends AppCompatActivity {
 
         //Listener para los mensajes entrantes
         player1Ref = database.getReference("salas/" + nombreSala + "/jugador1");
+        player2Ref = database.getReference("salas/" + nombreSala + "/jugador2");
         if(mRole == TicTacToeGame.PLAYER1_PLAYER) {
             playerRef = player1Ref;
         }else if(mRole == TicTacToeGame.PLAYER2_PLAYER) {
-            playerRef = database.getReference("salas/" + nombreSala + "/jugador2");
+            playerRef = player2Ref;
         }
         player1TurnRef = database.getReference("salas/" + nombreSala + "/jugador1Turno");
         player1StartRef = database.getReference("salas/" + nombreSala + "/jugador1Comienza");
@@ -200,6 +213,8 @@ public class MultiTicTacToeActivity extends AppCompatActivity {
         resPlayer1WinsRef = database.getReference("salas/"+nombreSala+"/stats/p1_gana");
         resPlayer2WinsRef = database.getReference("salas/"+nombreSala+"/stats/p2_gana");
 
+        clearListeners();
+
         inGameEventsListener();
 
         if (savedInstanceState == null) { //Primera ejecución de la actividad
@@ -208,7 +223,9 @@ public class MultiTicTacToeActivity extends AppCompatActivity {
             newGameRef.setValue(mNewGame);
             autoNewGameRef.setValue(mAutoNewGame);
             boardRef.setValue(mGame.getBoardStateList());
+            //if(mRole == TicTacToeGame.PLAYER2_PLAYER) mPlayer1Start = !mPlayer1Start;
             startNewGame();
+            //newGameRef.setValue(true);
         }
 
         displayScores();
@@ -218,8 +235,9 @@ public class MultiTicTacToeActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy(){
-        System.out.println("Actividad destruída");
         super.onDestroy();
+        System.out.println("Actividad destruída");
+        clearListeners();
     }
 
     @Override
@@ -394,7 +412,7 @@ public class MultiTicTacToeActivity extends AppCompatActivity {
             int pos = row * 3 + col;
 
             if(mPlayer1Turn){
-                if(mRole == TicTacToeGame.PLAYER1_PLAYER){
+                if(mRole == TicTacToeGame.PLAYER1_PLAYER && mPlayer2Joined){
                     playerMakeMove(TicTacToeGame.PLAYER1_PLAYER, pos);
                 }
             } else {
@@ -502,6 +520,22 @@ public class MultiTicTacToeActivity extends AppCompatActivity {
         }
     }
 
+    private void clearListeners(){
+        //ValueEventListener playerVEL;
+        if(playerVEL != null) playerRef.removeEventListener(playerVEL);
+        if(player1VEL != null) player1Ref.removeEventListener(player1VEL);
+        if(player2VEL != null) player2Ref.removeEventListener(player2VEL);
+        if(player1TurnVEL != null) player1TurnRef.removeEventListener(player1TurnVEL);
+        if(newGameVEL != null) newGameRef.removeEventListener(newGameVEL);
+        if(autoNewGameVEL != null) autoNewGameRef.removeEventListener(autoNewGameVEL);
+        if(boardCEL != null) boardRef.removeEventListener(boardCEL);
+        if(salaVEL != null) salaRef.removeEventListener(salaVEL);
+        if(player1StartVEL != null) player1StartRef.removeEventListener(player1StartVEL);
+        if(resTiesVEL != null) resTiesRef.removeEventListener(resTiesVEL);
+        if(resPlayer1WinsVEL != null) resPlayer1WinsRef.removeEventListener(resPlayer1WinsVEL);
+        if(resPlayer2WinsVEL != null) resPlayer2WinsRef.removeEventListener(resPlayer2WinsVEL);
+    }
+
     private void inGameEventsListener(){
 
         /*playerRef.addValueEventListener(new ValueEventListener() {
@@ -515,19 +549,70 @@ public class MultiTicTacToeActivity extends AppCompatActivity {
             }
         });*/
 
-        player1Ref.addValueEventListener(new ValueEventListener() {
+        player1VEL = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()) {
-                    if (mRole == TicTacToeGame.PLAYER2_PLAYER && snapshot.getValue(String.class).equals("")) {
-                        //Si el jugador 1 sale de la sala, cierra la sesión al jugador 2
-                        try {
-                            showDialog(DIALOG_SALA_CERRADA);
-                        } catch (Exception e) {
-                            Toast.makeText(MultiTicTacToeActivity.this, R.string.dialog_sala_cerrada, Toast.LENGTH_SHORT).show();
-                            System.out.println(e.getStackTrace());
-                            finish();
+                    final Handler handler = new Handler();
+
+                    if(snapshot.getValue(String.class).equals("")){
+                        mPlayer1Gone = true;
+                    } else{
+                        mPlayer1Gone = false;
+                    }
+
+                    runClose = new Runnable() {
+                        public void run() {
+                            //if (mRole == TicTacToeGame.PLAYER2_PLAYER && snapshot.getValue(String.class).equals("")) {
+                            if (mRole == TicTacToeGame.PLAYER2_PLAYER && mPlayer1Gone ){ //&& !salaRef.child("jugador1").equals("")) {
+                                //Si el jugador 1 sale de la sala, cierra la sesión al jugador 2
+                                try {
+                                    showDialog(DIALOG_SALA_CERRADA);
+                                } catch (Exception e) {
+                                    Toast.makeText(MultiTicTacToeActivity.this, R.string.dialog_sala_cerrada, Toast.LENGTH_SHORT).show();
+                                    System.out.println(e.getStackTrace());
+                                    finish();
+                                }
+                            } /*else if(snapshot.getValue(String.class).equals("")){
+                                System.out.println("JUgador 1 value: "+ salaRef.child("jugador1").equals(snapshot.getRef()));
+                                System.out.println("El valor era nulo, pero ya no lo es");
+                            }*/
                         }
+                    };
+
+                    handler.postDelayed(runClose, mDelayPlayer1Gone);
+
+                    /*if(!mPlayer1Gone){ //Si el jugador se ha ido, cancelar el handler
+                        System.out.println("handler cancelado!");
+                        handler.removeCallbacks(runClose);
+                    } else {
+
+                    }
+                    */
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+
+        player1Ref.addValueEventListener(player1VEL);
+
+        player2VEL = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.getValue(String.class).equals("")){ //Si no hay segundo jugador en la sala
+                    if(mRole == TicTacToeGame.PLAYER1_PLAYER){
+                        //Impedir al player 1 jugar
+                        mPlayer2Joined = false;
+                        Toast.makeText(MultiTicTacToeActivity.this, "Jugador 2 ha salido, esperando nuevo jugador...", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    if(mRole == TicTacToeGame.PLAYER1_PLAYER) {
+                        Toast.makeText(MultiTicTacToeActivity.this, "Jugador 2: " + snapshot.getValue(String.class) + " ha llegado!", Toast.LENGTH_SHORT).show();
+                        mPlayer2Joined = true;
                     }
                 }
             }
@@ -536,24 +621,25 @@ public class MultiTicTacToeActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        };
 
-        player1StartRef.addValueEventListener(new ValueEventListener() {
+        player2Ref.addValueEventListener(player2VEL);
+
+        player1StartVEL = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()) mPlayer1Start = snapshot.getValue(Boolean.class);
-                /*if(mGameOver) { //Only starts new game if its over
-                    startNewGame();
-                }*/
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        };
 
-        player1TurnRef.addValueEventListener(new ValueEventListener() {
+        player1StartRef.addValueEventListener(player1StartVEL);
+
+        player1TurnVEL = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()) mPlayer1Turn = snapshot.getValue(Boolean.class);
@@ -563,9 +649,11 @@ public class MultiTicTacToeActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        };
 
-        newGameRef.addValueEventListener(new ValueEventListener() {
+        player1TurnRef.addValueEventListener(player1TurnVEL);
+
+        newGameVEL = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()) {
@@ -582,9 +670,11 @@ public class MultiTicTacToeActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        };
 
-        autoNewGameRef.addValueEventListener(new ValueEventListener() {
+        newGameRef.addValueEventListener(newGameVEL);
+
+        autoNewGameVEL = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
@@ -598,9 +688,11 @@ public class MultiTicTacToeActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        };
 
-        boardRef.addChildEventListener(new ChildEventListener() {
+        autoNewGameRef.addValueEventListener(autoNewGameVEL);
+
+        boardCEL = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
@@ -629,9 +721,11 @@ public class MultiTicTacToeActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        };
 
-        resTiesRef.addValueEventListener(new ValueEventListener() {
+        boardRef.addChildEventListener(boardCEL);
+
+        resTiesVEL = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()) {
@@ -644,9 +738,11 @@ public class MultiTicTacToeActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        };
 
-        resPlayer1WinsRef.addValueEventListener(new ValueEventListener() {
+        resTiesRef.addValueEventListener(resTiesVEL);
+
+        resPlayer1WinsVEL = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()) {
@@ -659,9 +755,11 @@ public class MultiTicTacToeActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        };
 
-        resPlayer2WinsRef.addValueEventListener(new ValueEventListener() {
+        resPlayer1WinsRef.addValueEventListener(resPlayer1WinsVEL);
+
+        resPlayer2WinsVEL = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()) {
@@ -674,7 +772,9 @@ public class MultiTicTacToeActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        };
+
+        resPlayer2WinsRef.addValueEventListener(resPlayer2WinsVEL);
 
     }
 }

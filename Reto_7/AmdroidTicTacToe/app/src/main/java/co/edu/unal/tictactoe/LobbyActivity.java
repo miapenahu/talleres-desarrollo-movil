@@ -36,8 +36,12 @@ public class LobbyActivity extends AppCompatActivity {
     String nombreSala = "";
 
     FirebaseDatabase database;
+
     DatabaseReference salaRef;
     DatabaseReference lobbyRef;
+
+    ValueEventListener salaVEL;
+    ValueEventListener lobbyVEL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +59,8 @@ public class LobbyActivity extends AppCompatActivity {
 
         lvSalas = findViewById(R.id.lvSalas);
         bCrearSala = findViewById(R.id.bCrearSala);
+
+        clearListeners();
 
         //Todas las salas disponibles existentes
         lobby = new ArrayList<>();
@@ -103,8 +109,13 @@ public class LobbyActivity extends AppCompatActivity {
         finish();
     }*/
 
+    private void clearListeners(){
+        if(salaVEL != null) salaRef.removeEventListener(salaVEL);
+        if(lobbyVEL != null) lobbyRef.removeEventListener(lobbyVEL);
+    }
+
     private void addRoomEventListener(){
-        salaRef.addValueEventListener(new ValueEventListener() {
+        salaVEL = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 //Ingresar en la sala
@@ -114,6 +125,7 @@ public class LobbyActivity extends AppCompatActivity {
                         //intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                         intent.putExtra("nombreSala", nombreSala);
+                        if(lobbyStrings.contains(nombreSala)) intent.putExtra("salaCerrada",true);
                         startActivity(intent);
                     }
                     bCrearSala.setText("Crear Sala");
@@ -128,12 +140,14 @@ public class LobbyActivity extends AppCompatActivity {
                 bCrearSala.setEnabled(true);
                 Toast.makeText(LobbyActivity.this, "¡Error al crear sala!", Toast.LENGTH_SHORT).show();
             }
-        });
+        };
+        salaRef.addValueEventListener(salaVEL);
     }
 
     private void addLobbyEventListener(){
         lobbyRef = database.getReference("salas");
-        lobbyRef.addValueEventListener(new ValueEventListener() {
+
+        lobbyVEL = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 //Mostrar la lista de las salas
@@ -176,36 +190,8 @@ public class LobbyActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
                 //No hacer nada en caso de error
             }
-        });
-        lobbyRef.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+        };
 
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                for(String str : lobby){
-                    if(str.equals(snapshot.getKey())){
-                        str += str;
-                    }
-                }
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+        lobbyRef.addValueEventListener(lobbyVEL);
     }
 }

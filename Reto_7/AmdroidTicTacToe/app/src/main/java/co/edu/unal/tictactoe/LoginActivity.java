@@ -65,13 +65,7 @@ public class LoginActivity extends AppCompatActivity {
         usuariosRef = database.getReference("users");
         userRef = database.getReference("users/" + username);
 
-        if(usersVEL!= null) {
-            usuariosRef.removeEventListener(usersVEL);
-        } else if(userVEL != null){
-            userRef.removeEventListener(userVEL);
-        } else{
-            System.out.println("EventListener es nulo");
-        }
+        clearListeners();
 
         etUsername.setText(username);
 
@@ -121,6 +115,11 @@ public class LoginActivity extends AppCompatActivity {
                 break;
         }
         return dialog;
+    }
+
+    private void clearListeners(){
+        if(usersVEL!= null) usuariosRef.removeEventListener(usersVEL);
+        if(userVEL != null) userRef.removeEventListener(userVEL);
     }
 
     private void addButtonsEventListeners(){
@@ -183,14 +182,14 @@ public class LoginActivity extends AppCompatActivity {
                             System.out.println("El username está vacío!");
                         }
                     } else { //Si ya está guardado en shared prefs, entonces dejarlo ingresar
-                        if (snapshot.child(username).exists()) {
+                        //if (snapshot.child(username).exists()) {
                             //mValidationResults = true;
                             //userRef = database.getReference("users/" + username);
                             addEventListener();
                             userRef.setValue("");
                             Toast.makeText(LoginActivity.this, "Sesión iniciada exitosamente", Toast.LENGTH_SHORT).show();
                             System.out.println("Sesión iniciada exitosamente");
-                        }
+                        //}
                     }
             }
 
