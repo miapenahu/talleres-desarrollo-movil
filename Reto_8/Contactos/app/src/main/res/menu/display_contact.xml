@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:title="@string/menu_title_actions"
+        app:showAsAction = "always">
+        <menu>
+            <item android:id="@+id/Edit_Contact"
+                android:title="@string/edit"
+                android:icon="@drawable/edit"
+                android:orderInCategory="100"
+                app:showAsAction = "never"/>
+            <item android:id="@+id/Delete_Contact"
+                android:title="@string/delete"
+                android:icon="@drawable/delete"
+                android:orderInCategory="100"
+                app:showAsAction = "never"/>
+        </menu>
+
+    </item>
+
+</menu>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/logo" />
+
+    <TextView
+        android:id="@+id/textViewCompanyList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageView"
+        android:layout_centerHorizontal="true"
+        android:text="@string/company_list"
+        android:textSize="30sp"
+        android:textColor="?android:attr/textColorPrimary"
+        />
+
+    <SearchView
+        android:id="@+id/searchViewCompanies"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewCompanyList"
+        android:iconifiedByDefault="false"
+        android:queryHint="@string/company"></SearchView>
+
+    <LinearLayout
+        android:id="@+id/searchButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/searchViewCompanies"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/bConsultancyFilter"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:backgroundTint="#A3A3A3"
+            android:text="@string/consultancy"
+            android:textSize="11sp" />
+
+        <Button
+            android:id="@+id/bDevelopmentFilter"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:backgroundTint="#A3A3A3"
+            android:text="@string/development"
+            android:textSize="11sp" />
+
+        <Button
+            android:id="@+id/bFabricFilter"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:backgroundTint="#A3A3A3"
+            android:text="@string/fabric"
+            android:textSize="11sp" />
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/listView1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/searchButtons"
+        android:layout_centerInParent="true" />
+
+</RelativeLayout>

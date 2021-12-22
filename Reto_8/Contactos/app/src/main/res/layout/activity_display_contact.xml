@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin">
+
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".DisplayContact">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/editTextName"
+                android:layout_alignBottom="@+id/editTextName"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@+id/editTextPhone"
+                android:text="@string/name"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?android:attr/textColorPrimary"/>
+
+            <TextView
+                android:id="@+id/textView7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/editTextURL"
+                android:layout_alignLeft="@+id/textView1"
+                android:layout_alignBottom="@+id/editTextURL"
+                android:layout_toLeftOf="@+id/editTextURL"
+                android:text="@string/url"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?android:attr/textColorPrimary" />
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/editTextPhone"
+                android:layout_alignLeft="@+id/textView1"
+                android:layout_alignBottom="@+id/editTextPhone"
+                android:layout_toLeftOf="@+id/editTextPhone"
+                android:text="@string/phone"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?android:attr/textColorPrimary" />
+
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/editTextEmail"
+                android:layout_alignLeft="@+id/textView1"
+                android:layout_alignBottom="@+id/editTextEmail"
+                android:layout_toLeftOf="@+id/editTextEmail"
+                android:text="@string/email"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?android:attr/textColorPrimary" />
+
+            <TextView
+                android:id="@+id/textViewProducts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/editTextProducts"
+                android:layout_alignBottom="@+id/editTextProducts"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@+id/editTextProducts"
+                android:text="@string/products"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?android:attr/textColorPrimary" />
+
+            <TextView
+                android:id="@+id/textViewClasification"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textViewProducts"
+                android:layout_marginTop="20dp"
+                android:text="@string/clasification"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/editTextName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="100dp"
+                android:layout_marginTop="5dp"
+                android:ems="10"
+                android:inputType="text">
+
+                <requestFocus />
+            </EditText>
+
+            <EditText
+                android:id="@+id/editTextURL"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/editTextName"
+                android:layout_alignLeft="@+id/editTextName"
+                android:layout_marginTop="15dp"
+                android:ems="10"
+                android:inputType="text" />
+
+            <EditText
+                android:id="@+id/editTextPhone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/editTextURL"
+                android:layout_alignLeft="@+id/editTextName"
+                android:layout_marginTop="15dp"
+                android:ems="10"
+                android:inputType="phone|text" />
+
+            <EditText
+                android:id="@+id/editTextEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/editTextPhone"
+                android:layout_alignLeft="@+id/editTextName"
+                android:layout_marginTop="15dp"
+                android:ems="10"
+                android:inputType="textEmailAddress" />
+
+
+            <EditText
+                android:id="@+id/editTextProducts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/editTextEmail"
+                android:layout_alignRight="@+id/editTextName"
+                android:layout_marginTop="15dp"
+                android:ems="10"
+                android:inputType="text" />
+
+            <CheckBox
+                android:id="@+id/cbConsultancy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textViewClasification"
+                android:layout_alignLeft="@+id/textView1"
+                android:onClick="onCheckboxClicked"
+                android:text="@string/consultancy"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <CheckBox
+                android:id="@+id/cbDevelopment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/cbConsultancy"
+                android:layout_alignLeft="@+id/textView1"
+                android:onClick="onCheckboxClicked"
+                android:text="@string/development"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <CheckBox
+                android:id="@+id/cbFabric"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/cbDevelopment"
+                android:layout_alignLeft="@+id/textView1"
+                android:onClick="onCheckboxClicked"
+                android:text="@string/fabric"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <!-- Este textview sólo da un margen al final para el scroll view -->
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/cbFabric"
+                android:layout_marginBottom="20dp"
+                android:text=""
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="30dp"
+        android:onClick="run"
+        android:text="@string/save" />
+
+</RelativeLayout>

@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Contactos Empresariales</string>
+    <string name="menu_title_actions">Acciones</string>
+    <string name="Add_New">Nueva Empresa</string>
+    <string name="edit">Editar Empresa</string>
+    <string name="delete">Eliminar Empresa</string>
+    <string name="company">Empresa</string>
+    <string name="company_list">Lista de Empresas</string>
+
+    <string name="created_success">Creado exitosamente</string>
+    <string name="created_failure">Falló la creación</string>
+    <string name="updated_success">Modificado exitosamente</string>
+    <string name="updated_failure">Falló la modificación</string>
+    <string name="deleted_success">Eliminado con éxito</string>
+    <string name="deleted_failure">No se pudo eliminar</string>
+
+    <string name="name">Nombre</string>
+    <string name="url">URL</string>
+    <string name="phone">Teléfono contacto</string>
+    <string name="email">Email contacto</string>
+    <string name="products">Productos/Servicios</string>
+    <string name="clasification">Clasificación de la empresa</string>
+    <string name="consultancy">Consultoría</string>
+    <string name="development">Desarrollo a la medida</string>
+    <string name="fabric">Fábrica de software</string>
+
+    <string name="save">Guardar Contacto</string>
+    <string name="titleDeleteDialog">¿Estás seguro?</string>
+    <string name="deleteContact">¿Estás seguro de eliminar este contacto?</string>
+    <string name="yes">Si</string>
+    <string name="no">No</string>
+</resources>
