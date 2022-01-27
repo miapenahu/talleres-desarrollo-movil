@@ -35,16 +35,22 @@ public class GetHttpData extends AsyncTask {
     private PieChart pieChart;
     private String centerText;
     private String dataSetText;
+    private String acum_value;
+    private String value;
+    private int limit;
 
     private Context httpContext;
     ProgressDialog progressDialog;
 
-    public GetHttpData(List<Object> httpList, Context httpContext, PieChart pieChart, String centerText, String dataSetText) {
+    public GetHttpData(List<Object> httpList, Context httpContext, PieChart pieChart, int limit, String centerText, String dataSetText, String acum_value, String value) {
         this.httpList = httpList;
         this.httpContext = httpContext;
         this.pieChart = pieChart;
+        this.limit = limit;
         this.centerText = centerText;
         this.dataSetText = dataSetText;
+        this.acum_value = acum_value;
+        this.value = value;
     }
 
     @Override
@@ -109,29 +115,40 @@ public class GetHttpData extends AsyncTask {
                 String exportaciones_en_valor_usd;
                 String exportaciones_en_volumen;*/
                 }
-            } else if(jsonArray.getJSONObject(0).has("count_tradici_n_producto")){
+            } else if(jsonArray.getJSONObject(0).has(acum_value)){
                 long total = 0;
                 ArrayList<Pair<Long, String>> values = new ArrayList<>();
                 for (int i = 0; i < jsonArray.length(); i++) {
-                    String tradici_n_producto = jsonArray.getJSONObject(i).getString("tradici_n_producto");
-                    long count_tradici_n_producto = Integer.parseInt(jsonArray.getJSONObject(i).getString("count_tradici_n_producto"));
+                    String tradici_n_producto = jsonArray.getJSONObject(i).getString(value);
+                    long count_tradici_n_producto = Integer.parseInt(jsonArray.getJSONObject(i).getString(acum_value));
                     total += count_tradici_n_producto;
                     Pair<Long, String> ans = new Pair<>(count_tradici_n_producto, tradici_n_producto);
                     values.add(ans);
                 }
-                loadPieChartData(values,total);
-            } else if(jsonArray.getJSONObject(0).has("sum_exportaciones_en_volumen")){
+                loadPieChartData(values,total, limit);
+            } /*else if(jsonArray.getJSONObject(0).has("sum_exportaciones_en_volumen")){
                 long total = 0;
                 ArrayList<Pair<Long, String>> values = new ArrayList<>();
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < jsonArray.length(); i++) {
                     String departamento = jsonArray.getJSONObject(i).getString("departamento");
                     long sum_exportaciones_en_volumen = Integer.parseInt(jsonArray.getJSONObject(i).getString("sum_exportaciones_en_volumen"));
                     total += sum_exportaciones_en_volumen;
                     Pair<Long, String> ans = new Pair<>(sum_exportaciones_en_volumen, departamento);
                     values.add(ans);
                 }
-                loadPieChartData(values,total);
-            }
+                loadPieChartData(values,total, limit);
+            } else if(jsonArray.getJSONObject(0).has("count_producto")){
+                long total = 0;
+                ArrayList<Pair<Long, String>> values = new ArrayList<>();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    String producto = jsonArray.getJSONObject(i).getString("producto");
+                    long count_producto = Integer.parseInt(jsonArray.getJSONObject(i).getString("count_producto"));
+                    total += count_producto;
+                    Pair<Long, String> ans = new Pair<>(count_producto, producto);
+                    values.add(ans);
+                }
+                loadPieChartData(values,total, limit);
+            }*/
             System.out.println("httplist size: "+httpList.size());
         } catch (JSONException /*| UnsupportedEncodingException*/ e){
             e.printStackTrace();
@@ -153,13 +170,21 @@ public class GetHttpData extends AsyncTask {
         return  answer.toString();
     }
 
-    private void loadPieChartData(ArrayList<Pair<Long,String>> values, long total){
+    private void loadPieChartData(ArrayList<Pair<Long,String>> values, long total, int limit){
         pieChart.setCenterText(centerText);
-
         ArrayList<PieEntry> entries = new ArrayList<>();
-        for(int i = 0; i < values.size(); i++){
+
+        long acum = 0;
+
+        for(int i = 0; i < (limit != 0 ? limit : values.size()); i++){
+        //for(int i = 0; i < values.size(); i++){
             Pair<Long, String> res = values.get(i);
             entries.add(new PieEntry((float) res.first / total, res.second));
+            acum += res.first;
+        }
+
+        if(limit != 0){
+            entries.add(new PieEntry((float) (total - acum) / total, "Otros"));
         }
 
         ArrayList<Integer> colors = new ArrayList<>();
